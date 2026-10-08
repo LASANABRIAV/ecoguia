@@ -1,60 +1,109 @@
-# Documentation
-## Overview
-This template provides a minimal, opinionated starting point for building small Flask applications using SQLite. It focuses on clear structure, simple configuration, and a lightweight database setup. It intentionally does not include authentication, migrations, background jobs, or production deployment tooling. The goal is to give you a clean foundation that is easy to understand, modify, and extend, rather than a fully featured application.
+# 🌱 Ecoguía
 
-## Requirements
-The template requires Python 3.10 or newer and pip for dependency management. A virtual environment is strongly recommended to isolate dependencies, but not strictly required. No external database server is needed, as the template uses SQLite.
+Sitio web educativo sobre reciclaje, hecho con Flask y SQLite. Explica qué materiales se pueden reciclar y cómo separarlos, y permite que los visitantes dejen sugerencias que un administrador revisa en un panel protegido.
 
-## Important Note
-If `pip`, `flask`, and `pytest` are not available as direct commands on your system, use the module form instead:
-- `pip` becomes `python3 -m pip`
-- `flask` becomes `python3 -m flask`
-- `pytest` becomes `python3 -m pytest`
+## Funciones
 
-## Installation
-After downloading the template, create and activate a virtual environment, then install the dependencies by running `pip install -r requirements.txt`.
+- Página pública con contenido educativo sobre reciclaje.
+- Formulario para enviar sugerencias (nombre, correo y mensaje).
+- Acceso de administrador con usuario y contraseña.
+- Panel protegido para ver las sugerencias recibidas.
+- Base de datos SQLite: no necesita instalar ningún servidor.
 
-## Testing
-This template includes a basic test that verifies app setup and SQLite persistence. To run the test in the shell: `pytest -s`. The test prints a message at each step, ending with `"Test completed."`
+## Requisitos
 
-## Database Initialization
-You can initialize the database manually by running `flask init-db`. This creates the database file defined by `DATABASE` in `config.py` and initializes a `notes` table.
+- Python 3.10 o superior
+- pip
+- Git
 
-The database can also be initialized automatically at application startup if the database file does not already exist. This is intended for deployments hosted on services with no access to a shell.
+## Instalación
 
-Data persistence in production requires mounting a persistent volume and configuring the database path to point to that volume.
+### 1. Clonar el repositorio
 
-## Running the Development Server
-### Primary (recommended):
-Use `flask run` during development. This respects Flask configuration, environment variables, and CLI commands.
+```
+git clone https://github.com/LASANABRIAV/ecoguia.git
+cd ecoguia
+```
 
-### Alternative:
-Use `python3 main.py` as a simple entry point. This runs the server on port 5000. If port 5000 is already in use on your system, update the port value in `main.py` to an available port, for example: `port=5001`.
+### 2. Crear y activar el entorno virtual
 
-Once running, the app will be available at `http://127.0.0.1:<port>`, where `<port>` is the port the server is started on. If running on a hosted environment, use the platform-provided preview URL.
+En Windows (PowerShell):
 
-## Environment Configuration
-Environment-specific settings are managed using environment variables. `.env.example` documents the variables. You must copy or rename this file to `.env` and update the values as needed for your environment. The `.env` file is not committed to version control and is intended for local configuration only.
+```
+python -m venv venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+venv\Scripts\activate
+```
 
-## Structure
-This template is organized to separate configuration, routing, database logic, and templates. Application routes are defined in `routes.py`, database access is handled in `db.py`, and configuration is managed in `config.py`. HTML templates live in the `templates/` directory. This structure is intended to keep concerns isolated and make it clear where new features or files should be added.
+En Linux o macOS:
 
-## Adding New Features 
-To add new features, new routes must be defined in `routes.py`, following the existing patterns. Database changes or new queries must be added in `tables.py`, and new HTML templates must be created in the `templates/` directory. If a feature requires configuration, document the required environment variables in `.env.example` and set their values in `.env`, then access them through `config.py`.
+```
+python3 -m venv venv
+source venv/bin/activate
+```
 
-## Notes Example
-### Purpose
-The notes example is included as a reference implementation that demonstrates how the template is intended to be used. It shows a minimal feature built on top of the core structure, and is meant to be read, modified, or removed.
+### 3. Instalar las dependencias
 
-The example implements basic data creation and retrieval operations for notes, stored in a SQLite table. It demonstrates how routes, database queries, and templates work together within the template's structure.
+```
+pip install -r requirements.txt
+```
 
-### How to remove or replace the example
-The notes example can be safely deleted once you understand how it works. Remove the notes-related routes in `routes.py`, the `notes` table definition in `tables.py`, and the block for the notes in `index.html`, and the rest of the template will continue to function. Alternatively, you can rename or adapt the existing files and reuse them as the starting point for your own feature.
+### 4. Crear el administrador
 
-## What Is Safe to Change
-You are expected to modify `routes.py`, `tables.py`, and the files in the `templates/` directory to build your application. You can also update `.env` and extend `.env.example` when adding new configuration. Core wiring files such as `main.py`, `config.py`, and `db.py` should generally be left unchanged unless you understand how they are used by the application.
+La base de datos (`instance/app.db`) se crea sola la primera vez que arranca la aplicación. Para crear el usuario administrador, ejecuta:
 
-## License and Support
-This template is provided under the included license file and is offered as-is, without guarantees or ongoing support. You are free to modify and use it for your own projects in accordance with the license terms.
+```
+python crear_admin.py
+```
 
-Created by TheNeuroCoder. For more information about the developer: [neurocoder.io](https://neurocoder.io)
+El script te pedirá un usuario y una contraseña. La contraseña no se ve mientras la escribes y se guarda cifrada (hash), nunca en texto plano. Si el usuario ya existe, el script lo avisa y no crea un duplicado.
+
+### 5. Iniciar la aplicación
+
+```
+python main.py
+```
+
+Abre en el navegador: <http://127.0.0.1:5000>
+
+Si el puerto 5000 está ocupado, cambia el valor de `port` en `main.py`.
+
+## Uso
+
+- **Visitantes:** leen la guía y envían sugerencias desde el formulario al final de la página de inicio.
+- **Administrador:** pulsa "Acceso administrador" en la barra superior, inicia sesión y entra al "Panel" para ver las sugerencias.
+
+## Estructura del proyecto
+
+```
+ecoguia
+├── app
+│   ├── static/style.css     # estilos en verde
+│   ├── templates            # páginas HTML (base, index, login, panel)
+│   ├── routes.py            # rutas: inicio, sugerencias, login, logout, panel
+│   ├── tables.py            # tablas: sugerencias y administradores
+│   └── db.py                # conexión con SQLite
+├── config.py                # configuración (base de datos y SECRET_KEY)
+├── crear_admin.py           # script para crear el administrador
+├── main.py                  # punto de entrada
+└── requirements.txt
+```
+
+## Configuración
+
+La configuración se lee de variables de entorno, con valores por defecto para desarrollo:
+
+| Variable     | Valor por defecto   | Descripción                          |
+|--------------|---------------------|--------------------------------------|
+| `DATABASE`   | `instance/app.db`   | Ruta del archivo de base de datos    |
+| `SECRET_KEY` | `dev`               | Clave para firmar las sesiones       |
+
+> ⚠️ Es un proyecto académico con datos ficticios. Si algún día se publica en internet, hay que definir un `SECRET_KEY` propio como variable de entorno y usar una contraseña de administrador segura.
+
+## Docker
+
+Pendiente. Como la base de datos es un archivo SQLite, al usar contenedores habrá que guardar la carpeta `instance/` en un volumen para no perder los datos.
+
+## Créditos y licencia
+
+Proyecto basado en la plantilla [flask-sqlite-app-factory-template](https://github.com/theneurocoder/flask-sqlite-app-factory-template) de TheNeuroCoder. Se distribuye bajo la licencia MIT incluida en el archivo `LICENSE`.
